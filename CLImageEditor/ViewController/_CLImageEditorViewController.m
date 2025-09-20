@@ -824,12 +824,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         }
         else{
             // Image was not edited, treat as cancel
-            if([self.delegate respondsToSelector:@selector(imageEditorDidCancel:)]){
-                [self.delegate imageEditorDidCancel:self];
-            }
-            else{
-                [self dismissViewControllerAnimated:YES completion:nil];
-            }
+          [self pushedCloseBtn:self];
         }
     }
     else{

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import CLImageEditor
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITabBarDelegate,  CLImageEditorDelegate {
     
@@ -41,6 +40,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
   
     func imageEditorDidCancel(_ editor: CLImageEditor!) {
         debugPrint("imageEditorDidCancel")
+        editor.dismiss(animated: true)
     }
     
     /// called when editor completes
