@@ -27,6 +27,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 {
     UIImage *_originalImage;
     UIView *_bgView;
+    BOOL _imageWasEdited;
 }
 @synthesize toolInfo = _toolInfo;
 
@@ -58,6 +59,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
     self = [self init];
     if (self){
         _originalImage = [image deepCopy];
+        _imageWasEdited = NO;
         self.delegate = delegate;
     }
     return self;
@@ -67,6 +69,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 {
     self = [self init];
     if (self){
+        _imageWasEdited = NO;
         self.delegate = delegate;
     }
     return self;
@@ -298,6 +301,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
 - (void)showInViewController:(UIViewController*)controller withImageView:(UIImageView*)imageView;
 {
     _originalImage = imageView.image;
+    _imageWasEdited = NO;
     
     self.targetImageView = imageView;
     
@@ -776,6 +780,7 @@ static const CGFloat kMenuBarHeight = 80.0f;
         else if(image){
             self->_originalImage = image;
             self->_imageView.image = image;
+            self->_imageWasEdited = YES;
             
             [self resetImageViewFrame];
             self.currentTool = nil;
@@ -803,17 +808,28 @@ static const CGFloat kMenuBarHeight = 80.0f;
 - (void)pushedFinishBtn:(id)sender
 {
     if(self.targetImageView==nil){
-        if([self.delegate respondsToSelector:@selector(imageEditor:didFinishEditingWithImage:)]){
-            [self.delegate imageEditor:self didFinishEditingWithImage:_originalImage];
-        }
-        else if([self.delegate respondsToSelector:@selector(imageEditor:didFinishEdittingWithImage:)]){
+        if(_imageWasEdited){
+            if([self.delegate respondsToSelector:@selector(imageEditor:didFinishEditingWithImage:)]){
+                [self.delegate imageEditor:self didFinishEditingWithImage:_originalImage];
+            }
+            else if([self.delegate respondsToSelector:@selector(imageEditor:didFinishEdittingWithImage:)]){
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            [self.delegate imageEditor:self didFinishEdittingWithImage:_originalImage];
+                [self.delegate imageEditor:self didFinishEdittingWithImage:_originalImage];
 #pragma clang diagnostic pop
+            }
+            else{
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
         }
         else{
-            [self dismissViewControllerAnimated:YES completion:nil];
+            // Image was not edited, treat as cancel
+            if([self.delegate respondsToSelector:@selector(imageEditorDidCancel:)]){
+                [self.delegate imageEditorDidCancel:self];
+            }
+            else{
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
         }
     }
     else{

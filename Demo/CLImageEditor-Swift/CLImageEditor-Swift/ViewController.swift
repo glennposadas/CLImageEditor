@@ -38,10 +38,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         picker.pushViewController(editor!, animated: true)
         
     }
+  
+    func imageEditorDidCancel(_ editor: CLImageEditor!) {
+        debugPrint("imageEditorDidCancel")
+    }
     
     /// called when editor completes
     func imageEditor(_ editor: CLImageEditor!, didFinishEditingWith image: UIImage!) {
-        
+        debugPrint("didFinishEditingWith")
         imageView.image = image
         editor.dismiss(animated: true, completion: nil)
     }
